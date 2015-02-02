@@ -11,6 +11,41 @@ class Stop(models.Model):
     meaningful entity here, the station itself an architectural entity only.
     """
     stop_id = models.IntegerField()
-    stop_name = models.CharField(max_length=200, null=True)
-    stop_desc = models.CharField(max_length=200, null=True)
-    stop_point = models.PointField(srid=4269, null=True)
+    name = models.CharField(max_length=200, null=True)
+    desc = models.CharField(max_length=200, null=True)
+    point = models.PointField(srid=4269, null=True)
+    is_station = models.BooleanField(default=False)
+
+
+class Route(models.Model):
+    """
+    A route taken by a vehicle, in general terms. I.E., Red line southbound.
+    """
+    route_id = models.CharField(max_length=25)
+    short_name = models.CharField(max_length=150, null=True)
+    long_name = models.CharField(max_length=300, null=True)
+    desc = models.TextField(null=True)
+    type = models.IntegerField(null=True)
+    url = models.URLField(null=True)
+    color = models.CharField(max_length=6, default='FFFFFF')
+    text_color = models.CharField(max_length=6, default='000000')
+
+
+class Shape(models.Model):
+    """
+    A shape for a particular route.
+    """
+    shape_id = models.IntegerField()
+    line_string = models.LineStringField(null=True)
+
+
+class Trip(models.Model):
+    """
+    This is a scheduled instance of a route.
+    """
+    route = models.ForeignKey(Route)
+    shape = models.ForeignKey(Shape)
+    trip_id = models.IntegerField()
+    headsign = models.CharField(max_length=150, null=True)
+    short_name = models.CharField(max_length=150, null=True)
+    direction_id = models.IntegerField()
