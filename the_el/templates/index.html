@@ -1,0 +1,123 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>The El</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+      .map-boundary {
+        fill: none;
+        stroke: #aaa;
+      }
+
+      #select_trains, #select_buses, #select_all, #find_me {
+        cursor: pointer;
+        color: #777;
+        text-decoration: none;
+      }
+
+      #select_trains.active, #select_buses.active, #select_all.active {
+        cursor: pointer;
+        color: #333;
+        text-decoration: underline;
+      }
+
+      #info_pane {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        max-width: 25%;
+        border-right: 1px solid #aaa;
+        border-bottom: 1px solid #aaa;
+      }
+
+      #footer {
+        position: fixed;
+        bottom: 0px;
+        right: 0px;
+        padding: 10px;
+        border-left: 1px solid #aaa;
+        border-top: 1px solid #aaa;
+        background-color: rgba(255, 255, 255, 0.8);
+      }
+
+      text.user_position {
+        pointer-events: none;
+      }
+
+      svg {
+        position: fixed;
+        left: 0;
+        top: 0;
+      }
+
+      .streets {
+        stroke: #ccc;
+        stroke-width: 1px;
+        fill: #ccc;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <div id="map"></div>
+
+      <div id="info_pane" style="display:none"></div>
+
+      <div id="footer">
+        <p><span id="select_trains">Trains</span> | <span id="select_buses">Buses</span> | <span id="select_all" class="active">Everything</span> | <select id="select_route"><option value=''>Route</option></select> | <span id="find_me">Find Me</span> | <a href="http://twitter.com/aepton">@aepton</a></p>
+      </div>
+
+    </div> <!-- /container -->
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+    <script type="text/javascript">
+      var chicago_topojson = "{% static "chicago.topojson" %}",
+          streets_topojson = "{% static "Major_Streets.json" %}",
+          positions_json = {
+            'trains': "{% static "train_positions.json" %}",
+            'buses': "{% static "bus_positions.json" %}",
+            'all': "{% static "all_positions.json" %}"
+          },
+          current_positions = 'all',
+          map = {},
+          zoomed = false,
+          selected_route = '';
+    </script>
+    <script type="text/template" id="info_footer_tmpl">
+      <%= position.route %>
+      <%= position.type %> to <%= position.dest %>,
+      <%= getDistance(user.lat, user.lon, position.lat, position.lon).toFixed(2) %> miles away<br>
+      <% if (position.next) { %><% if (position.approaching) { %>Approaching <% } else { %> Next stop: <% } %><%= position.next %><br><% } %>
+      Heading <%= getCardinalDirection(position.heading) %><% if (position.delayed) { %>, but it's delayed<% } %><br>
+      <br>
+    </script>
+    <script type="text/template" id="select_route_tmpl">
+      <option value="<%= route %>"><%= route %></option>
+    </script>
+    <script src="{% static "all_map.js" %}"></script>
+  </body>
+</html>
