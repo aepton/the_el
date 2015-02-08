@@ -185,8 +185,9 @@ class Command(BaseCommand):
                 posfile.write(json.dumps(trains + buses))
                 posfile.close()
             """
-            # Sleep enough to run 3 times, leave headroom for all runs to complete in under a minute
-            time.sleep(12)
             runs += 1
+            if runs < 3:
+                # Sleep and run 3 times, leave headroom for all runs to complete in under a minute
+                time.sleep(12)
 
         os.unlink(pidfile)
