@@ -77,8 +77,15 @@ def load_trips():
     """
     Loads trips from GTFS-spec-compliant trips.txt file in data dir.
     """
-    pass
-
+    with open(os.path.join(settings.DATA_DIR, 'trips.txt')) as tripfile:
+        reader = DictReader(tripfile)
+        for line in reader:
+            trip, created = Trip.objects.get_or_create(trip_id=int(line['trip_id']))
+            trip.route = Route.objects.get(route_id=line['route_id'])
+            trip.shape = Shape.objects.get(shape_id=line['shape_id'])
+            trip.direction = line['direction']
+            trip.run = line['schd_trip_id']
+            trip.save()
 
 
 class Command(BaseCommand):

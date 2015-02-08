@@ -38,14 +38,16 @@ class Shape(models.Model):
     shape_id = models.IntegerField()
     line_string = models.LineStringField(null=True)
 
+    def as_json(self):
+        return self.line_string.geojson
+
 
 class Trip(models.Model):
     """
     This is a scheduled instance of a route.
     """
-    route = models.ForeignKey(Route)
-    shape = models.ForeignKey(Shape)
-    trip_id = models.IntegerField()
-    headsign = models.CharField(max_length=150, null=True)
-    short_name = models.CharField(max_length=150, null=True)
-    direction_id = models.IntegerField()
+    route = models.ForeignKey(Route, null=True)
+    shape = models.ForeignKey(Shape, null=True)
+    trip_id = models.BigIntegerField()
+    run = models.CharField(max_length=20, null=True)
+    direction = models.CharField(max_length=20, null=True)

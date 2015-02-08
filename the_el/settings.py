@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
-
+EL_STATIC_DIR = os.path.join(BASE_DIR, 'the_el', 'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -55,6 +55,33 @@ ROOT_URLCONF = 'the_el.urls'
 WSGI_APPLICATION = 'the_el.wsgi.application'
 
 
+# Set up logging
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s - %(levelname)s - line: %(lineno)d - %(message)s'
+        }
+    },
+    'handlers': {
+        'default': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'the_el.log'
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['default'],
+            'level': 'INFO',
+            'propagate': True
+        }
+    }
+}
+
+
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
@@ -92,3 +119,7 @@ STATIC_URL = '/static/'
 
 CTA_TRAIN_KEY_FILE = 'cta_train_key.txt'
 CTA_BUS_KEY_FILE = 'cta_bus_key.txt'
+
+AWS_SECRET_ACCESS_KEY = os.environ['ABE_AWS_SECRET_ACCESS_KEY']
+AWS_ACCESS_KEY_ID = os.environ['ABE_AWS_ACCESS_KEY_ID']
+EL_S3_BUCKET = 'el.epton.org'
