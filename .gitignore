@@ -4,3 +4,5 @@
 # General:
 *.pyc
 data/*
+the_el/static/*.json
+the_el/static/*.topojson
