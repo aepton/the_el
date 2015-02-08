@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import requests
+import sys
 import time
 import xmltodict
 
@@ -153,11 +154,20 @@ def upload_data_to_s3(s3_bucket, filename, directory_path, data_str):
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        # Check PID file, quit if we're still running.
+        # Check PID file, quit if we're still running. Not super robust but who cares.
+        pid = str(os.getpid())
+        pidfile = '/tmp/load_positions.pid'
+        if os.path.isfile(pidfile):
+            logging.error('%s already exists, exiting' % pidfile)
+            sys.exit()
+        else:
+            file(pidfile, 'w').write(pid)
+
         runs = 0
         while runs < 3:
             trains = get_train_positions()
             buses = get_bus_positions()
+            """
             upload_data_to_s3(
                 settings.EL_S3_BUCKET, 'train_positions.json', 'static', json.dumps(trains))
             upload_data_to_s3(
@@ -174,7 +184,9 @@ class Command(BaseCommand):
             with open(os.path.join(settings.EL_STATIC_DIR, 'all_positions.json'), 'w') as posfile:
                 posfile.write(json.dumps(trains + buses))
                 posfile.close()
-            """
+            #"""
             # Sleep enough to run 3 times, leave headroom for all runs to complete in under a minute
             time.sleep(12)
             runs += 1
+
+        os.unlink(pidfile)
