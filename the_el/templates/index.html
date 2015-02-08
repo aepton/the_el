@@ -72,6 +72,17 @@
         stroke-width: 1px;
         fill: #ccc;
       }
+
+      .map_tooltip {
+        background-color: rgba(255, 255, 255, 0.8);
+        border: 1px solid #aaa;
+        padding: 5px;
+        padding-bottom: 0px;
+      }
+
+      .map_tooltip h3 {
+          margin-top: 0px;
+        }
     </style>
   </head>
 
@@ -105,7 +116,8 @@
           current_positions = 'all',
           map = {},
           zoomed = false,
-          selected_route = '';
+          selected_route = '',
+          tooltip = {};
     </script>
     <script type="text/template" id="info_footer_tmpl">
       <%= position.route %>
@@ -118,6 +130,25 @@
     <script type="text/template" id="select_route_tmpl">
       <option value="<%= route %>"><%= route %></option>
     </script>
+    <script type="text/template" id="vehicle_tmpl">
+      <h3><%= vehicle['route'] %> <%= vehicle['type'] %></h3>
+      <h4>To <%= vehicle['dest'] %></h4>
+      <% if (vehicle['next']) { %>
+        <h4><% if (vehicle['approaching']) { %>Approaching <% } else { %>Next stop: <% } %> <%= vehicle['next'] %></h4>
+      <% } %>
+      <h4>Heading <%= getCardinalDirection(vehicle.heading) %><% if (vehicle.speed) {%> at <%= vehicle.speed %> mph<% } %><% if (vehicle.delayed) { %>, but it's delayed<% } %></h4>
+      <h4><% if (vehicle['type'] == 'bus') { %>Bus <% } else { %>Run <% } %> <%= vehicle['run'] %></h4>
+    </script>
     <script src="{% static "all_map.js" %}"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-29485819-5', 'auto');
+      ga('send', 'pageview');
+
+    </script>
   </body>
 </html>

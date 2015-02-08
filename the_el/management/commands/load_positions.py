@@ -133,7 +133,8 @@ def get_bus_positions():
                 'lon': bus['lon'],
                 'color': route_meta[bus['rt']]['color'],
                 'heading': bus['hdg'],
-                'delayed': True if bus.get('dly', False) else False
+                'delayed': True if bus.get('dly', False) else False,
+                'speed': None if not bus.get('spd', False) else bus['spd']
                 })
         except Exception, e:
             print e
@@ -167,7 +168,7 @@ class Command(BaseCommand):
         while runs < 3:
             trains = get_train_positions()
             buses = get_bus_positions()
-            
+            #"""
             upload_data_to_s3(
                 settings.EL_S3_BUCKET, 'train_positions.json', 'static', json.dumps(trains))
             upload_data_to_s3(

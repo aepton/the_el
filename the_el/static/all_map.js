@@ -151,18 +151,15 @@ function updatePositions(map, user, updateDropdown) {
         })
         .attr("stroke", function(d) { return d.color })
         .attr("class", "vehicle")
-        .append("svg:title")
-          .text(function(d) {
-            var app = '';
-            if (d['next']) {
-              if (d['approaching'])
-                app = ', approaching ';
-              else
-                app = ', next: ';
-              app += d['next'];
-            }
-            return d['route'] + ' ' + d['type'] + ' to ' + d['dest'] + app;
-          })
+        .on("mouseover", function(d) {
+          var tmpl = _.template($('#vehicle_tmpl').html());
+          tooltip.html(tmpl({vehicle: d}));
+          return tooltip.style("visibility", "visible");
+        })
+        .on("mousemove", function() { return tooltip.style("top",
+          (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px"); })
+        .on("mouseout", function() { return tooltip.style("visibility", "hidden"); });
+
       svg.selectAll("line.direction").remove();
       svg.selectAll("line.direction")
         .data(filtered).enter()
@@ -221,6 +218,12 @@ $(document).ready(function() {
       user.lon = position.coords.longitude;
     });
   }
+  tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .attr("class", "map_tooltip");
   d3.json(chicago_topojson, function (error, chicago) {
     map = drawMap(chicago, 'chicago', 60000, null);
     updatePositions(map, user, true);
