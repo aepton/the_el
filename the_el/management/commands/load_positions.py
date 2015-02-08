@@ -167,7 +167,7 @@ class Command(BaseCommand):
         while runs < 3:
             trains = get_train_positions()
             buses = get_bus_positions()
-            """
+            
             upload_data_to_s3(
                 settings.EL_S3_BUCKET, 'train_positions.json', 'static', json.dumps(trains))
             upload_data_to_s3(
@@ -184,7 +184,7 @@ class Command(BaseCommand):
             with open(os.path.join(settings.EL_STATIC_DIR, 'all_positions.json'), 'w') as posfile:
                 posfile.write(json.dumps(trains + buses))
                 posfile.close()
-            #"""
+            """
             # Sleep enough to run 3 times, leave headroom for all runs to complete in under a minute
             time.sleep(12)
             runs += 1
