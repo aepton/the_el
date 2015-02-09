@@ -100,7 +100,7 @@ def get_bus_positions_for_selected_routes(routes):
     vehicles_url = ('http://www.ctabustracker.com/bustime/api/v1/getvehicles?key=%s&rt=%s' %
                     (get_key(settings.CTA_BUS_KEY_FILE), ','.join(routes[:10])))
     try:
-        response = xmltodict.parse(requests.get(vehicles_url).text, timeout=settings.TIMEOUT_LENGTH)
+        response = xmltodict.parse(requests.get(vehicles_url, timeout=settings.TIMEOUT_LENGTH).text)
     except Exception:
         logging.warning('Timed out waiting for response from %s' % vehicles_url)
         return None
@@ -115,7 +115,7 @@ def get_bus_positions():
                   % get_key(settings.CTA_BUS_KEY_FILE))
     logging.info('Fetching all routes')
     try:
-        response = xmltodict.parse(requests.get(routes_url).text, timeout=settings.TIMEOUT_LENGTH)
+        response = xmltodict.parse(requests.get(routes_url, timeout=settings.TIMEOUT_LENGTH).text)
     except Exception:
         logging.warning('Timed out waiting for response from %s' % routes_url)
         return []
