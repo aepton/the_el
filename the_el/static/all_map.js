@@ -154,6 +154,8 @@ function updatePositions(map, user, updateDropdown) {
         .on("mouseover", function(d) {
           var tmpl = _.template($('#vehicle_tmpl').html());
           tooltip.html(tmpl({vehicle: d}));
+          tooltip.style("border", "1px solid " + d.color);
+          tooltip.style("color", d.color);
           return tooltip.style("visibility", "visible");
         })
         .on("mousemove", function() { return tooltip.style("top",

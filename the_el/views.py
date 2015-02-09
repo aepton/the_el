@@ -14,6 +14,20 @@ def index(request):
         })
 
 
+def route_json(request, pkey):
+    route = Route.objects.get(pk=pkey)
+    trips = Trip.objects.filter(route=route)
+    shapes = set()
+    all_shapes = []
+    trip_ids = set()
+    for trip in trips:
+        if trip.shape.shape_id not in shapes:
+            shapes.add(trip.shape.shape_id)
+            all_shapes.append(trip.shape.as_json())
+    return JsonResponse({
+        'shapes': all_shapes
+    })
+
 def route(request, pkey):
     route = Route.objects.get(pk=pkey)
     trips = Trip.objects.filter(route=route)

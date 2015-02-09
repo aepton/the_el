@@ -123,3 +123,4 @@ CTA_BUS_KEY_FILE = 'cta_bus_key.txt'
 AWS_SECRET_ACCESS_KEY = os.environ['ABE_AWS_SECRET_ACCESS_KEY']
 AWS_ACCESS_KEY_ID = os.environ['ABE_AWS_ACCESS_KEY_ID']
 EL_S3_BUCKET = 'el.epton.org'
+TIMEOUT_LENGTH = 5

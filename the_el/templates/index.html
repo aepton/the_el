@@ -74,7 +74,7 @@
       }
 
       .map_tooltip {
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: rgba(255, 255, 255, 0.9);
         border: 1px solid #aaa;
         padding: 5px;
         padding-bottom: 0px;
@@ -82,7 +82,13 @@
 
       .map_tooltip h3 {
           margin-top: 0px;
+      }
+
+      @media all and (max-width: 800px) {
+        #info_pane {
+          display: none !important;
         }
+      }
     </style>
   </head>
 
@@ -136,7 +142,7 @@
       <% if (vehicle['next']) { %>
         <h4><% if (vehicle['approaching']) { %>Approaching <% } else { %>Next stop: <% } %> <%= vehicle['next'] %></h4>
       <% } %>
-      <h4>Heading <%= getCardinalDirection(vehicle.heading) %><% if (vehicle.speed) {%> at <%= vehicle.speed %> mph<% } %><% if (vehicle.delayed) { %>, but it's delayed<% } %></h4>
+      <h4>Heading <%= getCardinalDirection(vehicle.heading) %><% if (vehicle.speed && parseInt(vehicle.speed) > 0) {%> at <%= vehicle.speed %> mph<% } %><% if (vehicle.delayed) { %>, but it's delayed<% } %></h4>
       <h4><% if (vehicle['type'] == 'bus') { %>Bus <% } else { %>Run <% } %> <%= vehicle['run'] %></h4>
     </script>
     <script src="{% static "all_map.js" %}"></script>

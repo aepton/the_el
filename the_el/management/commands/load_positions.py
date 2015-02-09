@@ -64,7 +64,11 @@ def get_train_positions():
     cta_url = ('http://lapi.transitchicago.com/api/1.0/ttpositions.aspx?key=%s&rt='
                'red,blue,brn,g,org,p,pink,y' % get_key(settings.CTA_TRAIN_KEY_FILE))
     logging.info('Fetching trains')
-    response = xmltodict.parse(requests.get(cta_url).text)
+    try:
+        response = xmltodict.parse(requests.get(cta_url).text)
+    except Exception:
+        logging.warning('Timed out waiting for response from %s' % cta_url)
+        return []
     trains = []
     for route in response['ctatt']['route']:
         for train in route.get('train', []):
@@ -95,7 +99,11 @@ def get_bus_positions_for_selected_routes(routes):
     logging.info('Fetching these routes: %s' % ', '.join(routes))
     vehicles_url = ('http://www.ctabustracker.com/bustime/api/v1/getvehicles?key=%s&rt=%s' %
                     (get_key(settings.CTA_BUS_KEY_FILE), ','.join(routes[:10])))
-    response = xmltodict.parse(requests.get(vehicles_url).text)
+    try:
+        response = xmltodict.parse(requests.get(vehicles_url).text, timeout=settings.TIMEOUT_LENGTH)
+    except Exception:
+        logging.warning('Timed out waiting for response from %s' % vehicles_url)
+        return None
     return response
 
 
@@ -106,7 +114,11 @@ def get_bus_positions():
     routes_url = ('http://www.ctabustracker.com/bustime/api/v1/getroutes?key=%s'
                   % get_key(settings.CTA_BUS_KEY_FILE))
     logging.info('Fetching all routes')
-    response = xmltodict.parse(requests.get(routes_url).text)
+    try:
+        response = xmltodict.parse(requests.get(routes_url).text, timeout=settings.TIMEOUT_LENGTH)
+    except Exception:
+        logging.warning('Timed out waiting for response from %s' % routes_url)
+        return []
     routes = []
     all_buses = []
     buses_json = []
@@ -114,13 +126,13 @@ def get_bus_positions():
     for route in response['bustime-response']['route']:
         if len(routes) == 10:
             buses = get_bus_positions_for_selected_routes(routes)
-            for vehicle in buses['bustime-response'].get('vehicle', []):
+            for vehicle in buses.get('bustime-response', {}).get('vehicle', []):
                 all_buses.append(vehicle)
             routes = []
         routes.append(route['rt'])
         route_meta[route['rt']] = {'name': route['rtnm'], 'color': route['rtclr']}
     buses = get_bus_positions_for_selected_routes(routes)
-    for vehicle in buses['bustime-response'].get('vehicle', []):
+    for vehicle in buses.get('bustime-response', {}).get('vehicle', []):
         all_buses.append(vehicle)
     for bus in all_buses:
         try:
@@ -169,12 +181,16 @@ class Command(BaseCommand):
             trains = get_train_positions()
             buses = get_bus_positions()
             #"""
-            upload_data_to_s3(
-                settings.EL_S3_BUCKET, 'train_positions.json', 'static', json.dumps(trains))
-            upload_data_to_s3(
-                settings.EL_S3_BUCKET, 'bus_positions.json', 'static', json.dumps(buses))
-            upload_data_to_s3(
-                settings.EL_S3_BUCKET, 'all_positions.json', 'static', json.dumps(trains + buses))
+            if trains:
+                upload_data_to_s3(
+                    settings.EL_S3_BUCKET, 'train_positions.json', 'static', json.dumps(trains))
+            if buses:
+                upload_data_to_s3(
+                    settings.EL_S3_BUCKET, 'bus_positions.json', 'static', json.dumps(buses))
+            if trains or buses:
+                upload_data_to_s3(
+                    settings.EL_S3_BUCKET, 'all_positions.json', 'static', json.dumps(
+                        trains + buses))
             """
             with open(os.path.join(settings.EL_STATIC_DIR, 'train_positions.json'), 'w') as posfile:
                 posfile.write(json.dumps(trains))
