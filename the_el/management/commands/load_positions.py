@@ -65,7 +65,7 @@ def get_train_positions():
                'red,blue,brn,g,org,p,pink,y' % get_key(settings.CTA_TRAIN_KEY_FILE))
     logging.info('Fetching trains')
     try:
-        response = xmltodict.parse(requests.get(cta_url).text)
+        response = xmltodict.parse(requests.get(cta_url, timeout=settings.TIMEOUT_LENGTH).text)
     except Exception:
         logging.warning('Timed out waiting for response from %s' % cta_url)
         return []

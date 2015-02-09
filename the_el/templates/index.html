@@ -101,7 +101,7 @@
       <div id="info_pane" style="display:none"></div>
 
       <div id="footer">
-        <p><span id="select_trains">Trains</span> | <span id="select_buses">Buses</span> | <span id="select_all" class="active">Everything</span> | <select id="select_route"><option value=''>Route</option></select> | <span id="find_me">Find Me</span> | <a href="http://twitter.com/aepton">@aepton</a></p>
+        <p><span id="select_trains" class="active">Trains</span> | <span id="select_buses">Buses</span> | <span id="select_all">Everything</span> | <select id="select_route"><option value=''>Route</option></select> | <span id="find_me">Find Me</span> | <a href="http://twitter.com/aepton">@aepton</a></p>
       </div>
 
     </div> <!-- /container -->
@@ -119,7 +119,7 @@
             'buses': "{% static "bus_positions.json" %}",
             'all': "{% static "all_positions.json" %}"
           },
-          current_positions = 'all',
+          current_positions = 'trains',
           map = {},
           zoomed = false,
           selected_route = '',
